@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import path from 'path';
 import { Transaction } from './models/Transaction';
 
 dotenv.config();
@@ -108,9 +109,8 @@ app.get('/api/admin/recent-transactions', async (req: Request, res: Response) =>
   }
 });
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('Bangalore Toll System API is Running');
-});
+// Serve static frontend files
+app.use(express.static(path.join(__dirname, '../../client/dist')));
 
 // Route to get all transactions
 app.get('/api/transactions', async (req: Request, res: Response) => {
@@ -166,6 +166,11 @@ app.post('/api/transactions', async (req: Request, res: Response): Promise<any> 
     console.error('Critical Transaction Failure:', error);
     res.status(500).json({ message: 'Internal Server Error during persistence' });
   }
+});
+
+// Fallback for React Router
+app.get('*', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
 });
 
 const PORT = process.env.PORT || 5000;
