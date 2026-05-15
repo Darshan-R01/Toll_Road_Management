@@ -1,4 +1,3 @@
-import React from 'react';
 // Line 3: These were causing the error because they weren't used below
 import { Truck, BusFront, LayoutDashboard, Settings } from 'lucide-react';
 
