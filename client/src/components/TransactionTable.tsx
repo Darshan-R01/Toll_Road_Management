@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { api } from '../api';
 import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
 
 type Transaction = {
@@ -15,7 +15,7 @@ export default function TransactionTable() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/transactions')
+    api.get('/transactions')
       .then(res => setTransactions(res.data))
       .catch(err => console.error('Could not load transactions', err));
   }, []);
