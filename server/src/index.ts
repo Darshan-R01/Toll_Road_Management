@@ -1,4 +1,5 @@
-import express from 'express';
+import dns from 'node:dns';
+import express, { Request, Response } from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -6,6 +7,9 @@ import mongoose from 'mongoose';
 import { Transaction } from './models/Transaction';
 
 dotenv.config();
+
+// Force MongoDB SRV resolution through Google DNS to bypass local ISP blocks
+dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 const mongoUri = process.env.MONGO_URI;
 
@@ -36,7 +40,7 @@ app.use(helmet({
 app.use(express.json());
 
 // Advanced Admin Route: Get Vehicle Statistics
-app.get('/api/admin/vehicle-stats', async (req, res) => {
+app.get('/api/admin/vehicle-stats', async (req: Request, res: Response) => {
   try {
     const stats = await Transaction.aggregate([
       {
@@ -60,7 +64,7 @@ app.get('/api/admin/vehicle-stats', async (req, res) => {
   }
 });
 
-app.get('/api/admin/system-summary', async (req, res) => {
+app.get('/api/admin/system-summary', async (req: Request, res: Response) => {
   try {
     const stats = await Transaction.aggregate([
       {
@@ -86,7 +90,7 @@ app.get('/api/admin/system-summary', async (req, res) => {
 });
 
 // Add this route for the 7-Day PDF Report
-app.get('/api/admin/recent-transactions', async (req, res) => {
+app.get('/api/admin/recent-transactions', async (req: Request, res: Response) => {
   try {
     // Calculate the date exactly 7 days ago
     const sevenDaysAgo = new Date();
@@ -104,12 +108,12 @@ app.get('/api/admin/recent-transactions', async (req, res) => {
   }
 });
 
-app.get('/', (req, res) => {
+app.get('/', (req: Request, res: Response) => {
   res.send('Bangalore Toll System API is Running');
 });
 
 // Route to get all transactions
-app.get('/api/transactions', async (req, res) => {
+app.get('/api/transactions', async (req: Request, res: Response) => {
   try {
     const transactions = await Transaction.find().sort({ timestamp: -1 });
     res.json(transactions);
@@ -118,9 +122,9 @@ app.get('/api/transactions', async (req, res) => {
   }
 });
 
-app.get('/api/transactions/:vehicleNumber', async (req, res) => {
+app.get('/api/transactions/:vehicleNumber', async (req: Request, res: Response) => {
   try {
-    const vehicleNumber = req.params.vehicleNumber?.toUpperCase();
+    const vehicleNumber = (req.params.vehicleNumber as string)?.toUpperCase();
 
     if (!vehicleNumber) {
       return res.status(400).json({ message: 'Vehicle number is required' });
@@ -135,7 +139,7 @@ app.get('/api/transactions/:vehicleNumber', async (req, res) => {
 });
 
 // The Production-Grade POST Route
-app.post('/api/transactions', async (req, res) => {
+app.post('/api/transactions', async (req: Request, res: Response): Promise<any> => {
   try {
     const { vehicleNumber, plazaName, amount, type } = req.body;
 
