@@ -169,7 +169,7 @@ app.post('/api/transactions', async (req: Request, res: Response): Promise<any> 
 });
 
 // Fallback for React Router
-app.get('/(.*)', (req: Request, res: Response) => {
+app.get('/*catchAll', (req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
 });
 
